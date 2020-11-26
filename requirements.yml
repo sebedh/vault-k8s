@@ -1,5 +1,0 @@
----
-dependencies:
-  - name: hashicorp/vault
-    version: 0.8.0
-    repository: https://helm.releases.hashicorp.com
