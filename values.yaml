@@ -3,24 +3,10 @@ global:
   enabled: true
   imagePullSecrets: []
   tlsDisable: true
+
+# injector not working on arm
 injector:
-  enabled: true
-  metrics:
-    enabled: true
-  image:
-    repository: "hashicorp/vault-k8s"
-    tag: "0.6.0"
-    pullPolicy: IfNotPresent
-  agentImage:
-    repository: "vault"
-    tag: "1.5.4"
-  resources:
-    requests:
-      memory: 128Mi
-      cpu: 150m
-    limits:
-      memory: 128Mi
-      cpu: 150m
+  enabled: false
 
 server:
   image:
