@@ -1,0 +1,89 @@
+---
+global:
+  enabled: true
+  imagePullSecrets: []
+  tlsDisable: true
+injector:
+  enabled: true
+  metrics:
+    enabled: true
+  image:
+    repository: "hashicorp/vault-k8s"
+    tag: "0.6.0"
+    pullPolicy: IfNotPresent
+  agentImage:
+    repository: "vault"
+    tag: "1.5.4"
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 150m
+    limits:
+      memory: 128Mi
+      cpu: 150m
+
+server:
+  image:
+    repository: "vault"
+    tag: "1.5.4"
+    pullPolicy: IfNotPresent
+
+  updateStrategyType: "OnDelete"
+
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 250m
+
+  service:
+    enabled: true
+    type: ClusterIP
+
+    port: 8200
+    targetPort: 8200
+
+  dataStorage:
+    enabled: true
+    size: 10Gi
+    mountPath: "/vault/data"
+    accessMode: ReadWriteOnce
+
+  auditStorage:
+    enabled: true
+    # Size of the PVC created
+    size: 5Gi
+    # Location where the PVC will be mounted.
+    mountPath: "/vault/audit"
+
+  ha:
+    enabled: true
+    replicas: 3
+
+    raft:
+      enabled: true
+      setNodeId: false
+
+      config: |
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+        }
+
+        service_registration "kubernetes" {}
+ui:
+  enabled: true
+  publishNotReadyAddresses: true
+  # The service should only contain selectors for active Vault pod
+  activeVaultPodOnly: false
+  serviceType: "LoadBalancer"
+  externalPort: 8200
